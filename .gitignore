@@ -1,0 +1,53 @@
+# -----------------------------
+# Global ignores
+# -----------------------------
+*.log
+.DS_Store
+Thumbs.db
+ehthumbs.db
+Icon?
+.env
+.env.local
+.env.*.local
+*.pid
+*.pid.lock
+
+# -----------------------------
+# Frontend (React / Next.js)
+# -----------------------------
+frontend/node_modules/
+frontend/.next/
+frontend/out/
+frontend/.next-cache/
+
+# -----------------------------
+# Backend (Python / FastAPI)
+# -----------------------------
+backend/__pycache__/
+backend/*.py[cod]
+backend/*.pyo
+backend/*.pyd
+backend/*.so
+backend/*.egg-info/
+backend/.eggs/
+backend/*.sqlite3
+backend/instance/
+backend/.pytest_cache/
+backend/.mypy_cache/
+
+# Ignore local Python environments
+backend/venv/
+backend/env/
+backend/.venv/
+
+# -----------------------------
+# Editor / IDE
+# -----------------------------
+.vscode/
+*.code-workspace
+
+# -----------------------------
+# Docker / Deployment
+# -----------------------------
+docker-compose.override.yml
+*.seed
