@@ -1,21 +1,61 @@
-from fastapi import FastAPI
-from fastapi import APIRouter, UploadFile, File
-from pydantic import BaseModel
-from langchain.document_loaders import PyPDFLoader
-from langchain.text_splitter import RecursiveCharacterTextSplitter
-from langchain_google_genai import ChatGoogleGenerativeAI, GoogleGenerativeAIEmbeddings
-from langchain.vectorstores import Chroma
-from langchain_core.runnables import RunnablePassthrough
-from langchain_core.prompts import ChatPromptTemplate
-from langchain_core.pydantic_v1 import BaseModel, Field
-from sentence_transformers import SentenceTransformer
-from sklearn.metrics.pairwise import cosine_similarity
-from typing import Dict, List, Tuple
+import uuid
+from fastapi import FastAPI, HTTPException, Query
+from typing import Optional
+from app.schemas import StartSessionResponse, AskRequest, AskResponse, KBRebuildResponse
+from app.settings import settings
+from app.rag_chatbot import EnhancedPDFRAGChatbot
 
-from langchain.evaluation import load_evaluator
+app = FastAPI(title="RAG Chatbot API")
 
-from langchain_core.retrievers import BaseRetriever
-from langchain.document_loaders import PyPDFLoader
-from langchain.chains import RetrievalQA
-from langchain.schema import Document
-import re
+bot = EnhancedPDFRAGChatbot(
+    mongo_uri=settings.MONGO_URI,
+    mongo_db=settings.MONGO_DB,
+    mongo_collection=settings.MONGO_COLLECTION,
+    api_key=settings.GEM_API_KEY,
+    vectorstore_path=settings.VECTORSTORE_PATH,
+)
+
+
+@app.get("/start-session", response_model=StartSessionResponse)
+def start_session():
+    return {"session_id": str(uuid.uuid4())}
+
+
+@app.post("/ask", response_model=AskResponse)
+async def ask(req: AskRequest):
+    try:
+        session_id = req.session_id or str(uuid.uuid4())
+        result = await bot.ask_question(
+            session_id=session_id,
+            question=req.question,
+            user_id=req.user_id or "anonymous",
+            k=req.k or 6,
+        )
+        return AskResponse(
+            answer=result["answer"],
+            sources=result.get("sources"),
+            reasoning=result.get("reasoning"),
+            session_id=session_id,
+            timestamp=result["timestamp"],
+        )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/rebuild-kb", response_model=KBRebuildResponse)
+def rebuild_kb(folder: Optional[str] = None):
+    try:
+        summary = bot.rebuild_knowledge_base(folder or settings.KB_FOLDER)
+        return {"status": "rebuilt", "summary": summary}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/chat-history/{session_id}")
+async def get_chat_history(session_id: str, limit: int = 200):
+    cursor = (
+        bot.chat_collection.find({"session_id": session_id})
+        .sort("timestamp", 1)
+        .limit(limit)
+    )
+    return await cursor.to_list(length=limit)
