@@ -14,7 +14,7 @@ import {
   Eye,
   SlidersHorizontal,
 } from "lucide-react"
-import { Card } from "@/components/ui/Card"
+import { Card } from "@/components/ui/card"
 import { PROJECTS } from "@/constants"
 
 export function ProjectsWindow() {
@@ -271,9 +271,8 @@ export function ProjectsWindow() {
               </div>
               <button
                 onClick={() => setShowFilters(!showFilters)}
-                className={`p-2 rounded-full transition-colors ${
-                  showFilters ? "bg-blue-100 text-blue-600" : "bg-gray-100 text-gray-600"
-                }`}
+                className={`p-2 rounded-full transition-colors ${showFilters ? "bg-blue-100 text-blue-600" : "bg-gray-100 text-gray-600"
+                  }`}
               >
                 <SlidersHorizontal className="w-5 h-5" />
               </button>
@@ -303,11 +302,10 @@ export function ProjectsWindow() {
                   <button
                     key={filter.key}
                     onClick={() => setSelectedFilter(filter.key as any)}
-                    className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 ${
-                      selectedFilter === filter.key
+                    className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 ${selectedFilter === filter.key
                         ? "bg-blue-500 text-white shadow-sm"
                         : "bg-gray-100 text-gray-700 active:bg-gray-200"
-                    }`}
+                      }`}
                   >
                     {filter.label}
                   </button>
@@ -399,18 +397,16 @@ export function ProjectsWindow() {
             <div className="flex items-center bg-gray-100 rounded-lg p-1">
               <button
                 onClick={() => setViewMode("grid")}
-                className={`p-2 rounded-md transition-colors ${
-                  viewMode === "grid" ? "bg-white text-blue-600 shadow-sm" : "text-gray-500 hover:text-gray-700"
-                }`}
+                className={`p-2 rounded-md transition-colors ${viewMode === "grid" ? "bg-white text-blue-600 shadow-sm" : "text-gray-500 hover:text-gray-700"
+                  }`}
                 title="Grid View"
               >
                 <Grid3X3 className="w-4 h-4" />
               </button>
               <button
                 onClick={() => setViewMode("list")}
-                className={`p-2 rounded-md transition-colors ${
-                  viewMode === "list" ? "bg-white text-blue-600 shadow-sm" : "text-gray-500 hover:text-gray-700"
-                }`}
+                className={`p-2 rounded-md transition-colors ${viewMode === "list" ? "bg-white text-blue-600 shadow-sm" : "text-gray-500 hover:text-gray-700"
+                  }`}
                 title="List View"
               >
                 <List className="w-4 h-4" />

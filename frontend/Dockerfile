@@ -1,38 +1,38 @@
-# ---------------------------
-# Stage 1: Build Next.js app
-# ---------------------------
-FROM node:18-alpine AS builder
-
-# Set working directory
+# ---------- base ----------
+FROM node:20-bookworm-slim AS base
 WORKDIR /app
+ENV NEXT_TELEMETRY_DISABLED=1
 
-# Install dependencies
+# ---------- deps (cached) ----------
+FROM base AS deps
 COPY package.json package-lock.json ./
-RUN npm install --frozen-lockfile
+RUN npm ci
 
-# Copy project files
+# ---------- dev (hot reload) ----------
+FROM base AS dev
+ENV NODE_ENV=development
+COPY --from=deps /app/node_modules ./node_modules
+# no source code copied here; we'll mount it as a volume
+EXPOSE 3000
+CMD ["npm","run","dev"]
+
+# ---------- builder (prod build) ----------
+FROM base AS builder
+ENV NODE_ENV=production
+COPY --from=deps /app/node_modules ./node_modules
 COPY . .
-
-# Build the Next.js app for production
+# if you use standalone runner, ensure next.config has: output: 'standalone'
 RUN npm run build
 
-# ---------------------------
-# Stage 2: Production server
-# ---------------------------
-FROM node:18-alpine AS runner
-
+# ---------- runner (prod) ----------
+FROM node:20-bookworm-slim AS runner
 WORKDIR /app
-
-ENV NODE_ENV=production
-
-# Copy only necessary files from builder
-COPY --from=builder /app/package.json ./
-COPY --from=builder /app/node_modules ./node_modules
-COPY --from=builder /app/.next ./.next
+ENV NODE_ENV=production NEXT_TELEMETRY_DISABLED=1 PORT=3000
+RUN useradd -m nextjs
+# standalone output
 COPY --from=builder /app/public ./public
-
-# Expose Next.js port
+COPY --from=builder /app/.next/standalone ./
+COPY --from=builder /app/.next/static ./.next/static
+USER nextjs
 EXPOSE 3000
-
-# Start Next.js
-CMD ["npm", "start"]
+CMD ["node", "server.js"]

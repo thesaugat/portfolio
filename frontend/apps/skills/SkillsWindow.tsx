@@ -1,6 +1,6 @@
 "use client"
 
-import { Card } from "@/components/ui/Card"
+import { Card } from "@/components/ui/card"
 import { ProgressBar } from "@/components/ui/ProgressBar"
 import { getColorClasses } from "@/utils/colors"
 import { SKILL_CATEGORIES } from "@/constants"

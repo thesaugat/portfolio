@@ -1,5 +1,3 @@
-version: "3.9"
-
 services:
   frontend:
     build:
@@ -9,32 +7,41 @@ services:
     ports:
       - "3000:3000"
     environment:
-      - NODE_ENV=production
+      - NODE_ENV=development
       - NEXT_PUBLIC_API_URL=http://localhost:8000
     depends_on:
-      - backend
+      - ml-service
 
-  backend:
-    build:
-      context: ./backend
-      dockerfile: Dockerfile
-    container_name: saugat-backend
-    ports:
-      - "8000:8000"
-    environment:
-      - MONGO_URI=mongodb://mongo:27017/saugat
-      - GOOGLE_API_KEY=${GOOGLE_API_KEY}
-    depends_on:
-      - mongo
+  # backend:
+  #   build:
+  #     context: ./backend
+  #     dockerfile: Dockerfile
+  #   container_name: saugat-backend
+  #   ports:
+  #     - "8000:8000"
+  #   environment:
+  #     - MONGO_URI=mongodb://mongo:27017/saugat
+  #     - GOOGLE_API_KEY=${GOOGLE_API_KEY}
+  #   depends_on:
+  #     - mongo
 
   mongo:
-    image: mongo:6.0
-    container_name: saugat-mongo
-    restart: always
+    image: mongo
     ports:
       - "27017:27017"
     volumes:
       - mongo_data:/data/db
+
+  ml-service:
+    build:
+      context: ./ml-service
+    volumes:
+      - ./ml-service:/app # Mount code so it auto-reloads
+      - ./.env:/app/.env # Mount .env file
+    env_file:
+      - .env
+    ports:
+      - "8000:8000"
 
 volumes:
   mongo_data:

@@ -3,9 +3,9 @@
 import type React from "react"
 import { useState } from "react"
 import { Send } from "lucide-react"
-import { Button } from "@/components/ui/Button"
-import { Input } from "@/components/ui/Input"
-import { Card } from "@/components/ui/Card"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Card } from "@/components/ui/card"
 import { CONTACT_INFO, SOCIAL_LINKS } from "@/constants"
 
 export function ContactWindow() {
@@ -108,7 +108,7 @@ export function ContactWindow() {
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <Input
-                  label="Name *"
+                  // label="Name *"
                   type="text"
                   name="name"
                   value={formData.name}
@@ -117,7 +117,7 @@ export function ContactWindow() {
                   required
                 />
                 <Input
-                  label="Email *"
+                  // label="Email *"
                   type="email"
                   name="email"
                   value={formData.email}
@@ -128,7 +128,7 @@ export function ContactWindow() {
               </div>
 
               <Input
-                label="Subject *"
+                // label="Subject *"
                 type="text"
                 name="subject"
                 value={formData.subject}

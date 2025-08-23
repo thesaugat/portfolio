@@ -1,7 +1,7 @@
 "use client"
 
 import { Download, Calendar, MapPin, Mail, Phone, ExternalLink } from "lucide-react"
-import { Button } from "@/components/ui/Button"
+import { Button } from "@/components/ui/button"
 import { EXPERIENCE, EDUCATION, ACHIEVEMENTS } from "@/constants"
 
 export function ResumeWindow() {
