@@ -2,6 +2,7 @@ import os, uuid, shutil
 from fastapi import FastAPI, HTTPException, UploadFile, File
 from .config import settings
 from .db.schemas import ChatRequest, ChatResponse
+
 from app.db.mongo_repo import (
     init_mongo,
     get_or_create_session,
@@ -110,10 +111,13 @@ async def chat(req: ChatRequest):
         if req.use_history
         else []
     )
+
     enriched_q = _build_enriched_question(history_pairs, req.question)
 
     # ask RAG
-    answer, sources = bot.chat(question=enriched_q, k=req.k, structured=req.structured)
+    answer, sources = bot.chat(
+        question=req.question, k=req.k, structured=req.structured
+    )
 
     # store assistant response
     await save_message(a_sync_db, session_oid, "assistant", answer, sources)
