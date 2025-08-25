@@ -10,34 +10,32 @@ services:
       - NODE_ENV=development
       - NEXT_PUBLIC_API_URL=http://localhost:8000
     depends_on:
-      - ml-service
-
-  # backend:
-  #   build:
-  #     context: ./backend
-  #     dockerfile: Dockerfile
-  #   container_name: saugat-backend
-  #   ports:
-  #     - "8000:8000"
-  #   environment:
-  #     - MONGO_URI=mongodb://mongo:27017/saugat
-  #     - GOOGLE_API_KEY=${GOOGLE_API_KEY}
-  #   depends_on:
-  #     - mongo
+      - backend
 
   mongo:
+    container_name: saugat-mongo
     image: mongo
     ports:
       - "27017:27017"
     volumes:
       - mongo_data:/data/db
 
-  ml-service:
+  backend:
+    container_name: saugat-backend
     build:
-      context: ./ml-service
+      context: ./backend
+    environment:
+      - gem_api_key=${gem_api_key}
+      - MONGO_URI=mongodb://mongo:27017
+      - DB_NAME=ragdb
+      - KB_FOLDER=/data/knowledge_base
+      - PERSIST_DIR=/data/kb_chroma
     volumes:
-      - ./ml-service:/app # Mount code so it auto-reloads
-      - ./.env:/app/.env # Mount .env file
+      - ./backend:/app                          # code hot-reload
+      - ./.env:/app/.env                           # env file (optional if using env_file)
+      - ./backend/data/knowledge_base:/data/knowledge_base:ro   # << inside ml-service now
+      - ./backend/data/kb_chroma:/data/kb_chroma        
+    
     env_file:
       - .env
     ports:
